@@ -1,0 +1,21 @@
+﻿design,covariate,smd_before,smd_after_ipw
+Bad news -> late disclosure,lag_size,-0.22329732074351338,0.049289659515428914
+Bad news -> late disclosure,lag_profitability,-0.5104549711778886,0.12305062627540901
+Bad news -> late disclosure,lag_leverage,0.2570985010075767,-0.057116654537356044
+Bad news -> late disclosure,lag_revenue_growth,-0.23307581384742532,0.0998610858701866
+Bad news -> late disclosure,lag_profit_growth,-0.26146379452519153,0.05131458641052255
+Bad news -> late disclosure,lag_eps,-0.5205510279453942,0.15706864222206687
+Bad news -> late disclosure,lag_cashflow_ps,-0.3894264227476646,0.14052043541312706
+Bad news -> late disclosure,lag_liquidity,-0.15226638367858567,0.03663081765764739
+Late disclosure -> announcement CAR,lag_size,-0.060815790147668046,-0.050132858254594556
+Late disclosure -> announcement CAR,lag_profitability,-0.20817802793193152,-0.08994151022740378
+Late disclosure -> announcement CAR,lag_leverage,0.33036115073282096,0.12122431717127012
+Late disclosure -> announcement CAR,lag_revenue_growth,-0.02220964608782341,-0.15357847004378955
+Late disclosure -> announcement CAR,lag_profit_growth,-0.28627870460040183,-0.13990273032523953
+Late disclosure -> announcement CAR,lag_eps,-0.20681638556704346,-0.09431808605401809
+Late disclosure -> announcement CAR,lag_cashflow_ps,-0.12432052344221158,-0.11380370897733519
+Late disclosure -> announcement CAR,lag_liquidity,-0.21089963628851172,-0.051931926498640965
+Late disclosure -> announcement CAR,bad_news_realized,0.31720735078111434,0.040450624783280736
+Late disclosure -> announcement CAR,forecast_bad,0.3012157881580223,0.018988618907815936
+Late disclosure -> announcement CAR,forecast_available,0.2952518641805407,0.2572505224937276
+Late disclosure -> announcement CAR,first_doy,1.3842989483127852,-0.08550636860334132

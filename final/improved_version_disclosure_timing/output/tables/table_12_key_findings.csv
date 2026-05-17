@@ -1,0 +1,7 @@
+﻿finding,estimate,p_value,interpretation
+Bad-news firms are more likely to disclose late,0.15535314373013803,1.531582382839566e-40,"Bad-news firm-years have a higher probability of being in the latest disclosure quartile, conditional on lagged fundamentals, year FE, and industry FE."
+Bad-news firms are more likely to postpone,0.07204941201151484,2.330679203453401e-15,Schedule revisions are correlated with realized bad news.
+Schedule-only incremental prediction is positive but modest,0.005329184866072256,0.18,Adding full schedule variables to lagged fundamentals raises LightGBM test AUC slightly; the bootstrap CI includes zero.
+Forecast plus schedule signals strongly predict bad news,0.9910409062805401,,"Public pre-report signals, especially earnings forecasts, carry strong information about realized annual-report bad news."
+Annual-report event reaction is not statistically strong,0.009895814860965666,0.6619536563272153,"The CAR[0,+5] interaction between late disclosure and bad news is not significant in the event-study sample; this is consistent with partial pre-disclosure information absorption."
+Size heterogeneity is limited,6.939985987813359e-05,0.9975390031640997,Splitting firms by the fiscal-year median of lagged size shows nearly identical bad-news effects for small and large firms; the interaction is economically tiny and statistically insignificant.

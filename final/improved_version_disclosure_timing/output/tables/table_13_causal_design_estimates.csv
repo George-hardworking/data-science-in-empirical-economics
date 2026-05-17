@@ -1,0 +1,7 @@
+﻿design,estimator,outcome,estimate,std_error,p_value,n,interpretation
+Bad news -> late disclosure,Naive difference in means,late_disclosure_q75,0.1827507153779409,,,10203,未控制混杂变量的组间差异，仅作描述性基准。
+Bad news -> late disclosure,IPW with lagged fundamentals + year/industry FE,late_disclosure_q75,0.13809153548308511,0.013232313388485725,1.699361195904253e-25,10203,倾向得分加权后，坏消息仍显著提高晚披露概率；可解释为控制可观测混杂后的准因果证据。
+Bad news -> late disclosure,Cross-fitted AIPW,late_disclosure_q75,0.12464603200272696,0.010630818633682346,0.0,10203,双重稳健估计结果与 IPW 方向一致，说明结论不完全依赖单一模型设定。
+Late disclosure -> announcement CAR,Naive difference in means,"CAR[0,+5]",0.0078173525563303,,,238,未控制混杂变量的公告窗口收益差异。
+Late disclosure -> announcement CAR,IPW with fundamentals + bad news + forecasts,"CAR[0,+5]",0.018541311035938642,0.014086404923563138,0.18808822797808677,238,加权后晚披露对公告后 CAR 的影响不显著，因此不能声称晚披露导致公告窗口下跌。
+Late disclosure -> placebo pre-window CAR,IPW placebo,"CAR[-5,-1]",0.014874513032646593,0.009040974204331854,0.09992168127897583,238,披露前窗口的安慰剂检验用于检查是否存在明显前趋势差异。

@@ -1,0 +1,10 @@
+﻿package,version
+Python,3.11.14
+AkShare,1.18.55
+Pandas,2.3.3
+NumPy,2.3.4
+Scikit-learn,1.7.2
+LightGBM,4.6.0
+Statsmodels,0.14.5
+Matplotlib,3.10.7
+Seaborn,0.13.2

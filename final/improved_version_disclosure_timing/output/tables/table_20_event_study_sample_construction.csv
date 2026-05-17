@@ -1,0 +1,4 @@
+﻿step,observations
+"Candidate firm-years with nonmissing actual disclosure dates, fiscal years 2021-2023",6539
+Stratified event-study draw capped for runtime/API stability,240
+Valid windows with daily stock returns and CSI 300 benchmark from -20 to +20 trading days,240

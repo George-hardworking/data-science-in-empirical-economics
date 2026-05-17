@@ -1,0 +1,8 @@
+﻿check,specification,test_auc,average_precision,bad_news_coef,bad_news_p_value,placebo_mean_auc,placebo_p_ge_real
+Alternative target: bad_news_realized,Lag fundamentals,0.7519665330381539,0.5439882205415619,,,,
+Alternative target: bad_news_realized,Fundamentals + full schedule,0.7572957179042261,0.5558373301637233,,,,
+Alternative target: severe_bad_news,Lag fundamentals,0.802757806517485,0.5738838020811836,,,,
+Alternative target: severe_bad_news,Fundamentals + full schedule,0.8017112652088828,0.5589913965957548,,,,
+Alternative late threshold: late_disclosure_q75,LPM with controls and fixed effects,,,0.15535314373013803,1.531582382839566e-40,,
+Alternative late threshold: late_disclosure_q67,LPM with controls and fixed effects,,,0.16571799262507636,2.1005464080793027e-44,,
+Placebo labels,80 random permutations,0.7572957179042261,,,,0.46423717066554976,0.0

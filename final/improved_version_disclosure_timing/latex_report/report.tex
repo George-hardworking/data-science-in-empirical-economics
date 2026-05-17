@@ -1,0 +1,431 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=0.72in]{geometry}
+\usepackage{iftex}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{setspace}
+
+\ifPDFTeX
+  \usepackage{newtxtext}
+  \usepackage{newtxmath}
+\else
+  \usepackage{fontspec}
+  \defaultfontfeatures{Ligatures=TeX}
+  \IfFontExistsTF{Times New Roman}{
+    \setmainfont{Times New Roman}
+    \setsansfont{Times New Roman}
+    \setmonofont{Times New Roman}
+  }{
+    \setmainfont{Times New Roman}[
+      Path=/System/Library/Fonts/Supplemental/,
+      UprightFont=Times New Roman.ttf,
+      BoldFont=Times New Roman Bold.ttf,
+      ItalicFont=Times New Roman Italic.ttf,
+      BoldItalicFont=Times New Roman Bold Italic.ttf
+    ]
+    \setsansfont{Times New Roman}[
+      Path=/System/Library/Fonts/Supplemental/,
+      UprightFont=Times New Roman.ttf,
+      BoldFont=Times New Roman Bold.ttf,
+      ItalicFont=Times New Roman Italic.ttf,
+      BoldItalicFont=Times New Roman Bold Italic.ttf
+    ]
+    \setmonofont{Times New Roman}[
+      Path=/System/Library/Fonts/Supplemental/,
+      UprightFont=Times New Roman.ttf,
+      BoldFont=Times New Roman Bold.ttf,
+      ItalicFont=Times New Roman Italic.ttf,
+      BoldItalicFont=Times New Roman Bold Italic.ttf
+    ]
+  }
+  \usepackage{unicode-math}
+  \IfFontExistsTF{texgyretermes-math.otf}{
+    \setmathfont{texgyretermes-math.otf}
+  }{
+    \setmathfont{XITSMath-Regular.otf}
+  }
+\fi
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!45!black,
+  citecolor=blue!45!black,
+  urlcolor=blue!45!black
+}
+
+\setstretch{0.965}
+\setlist[itemize]{leftmargin=1.2em}
+\setlist[enumerate]{leftmargin=1.4em}
+\captionsetup{font=small, labelfont=bf}
+\renewcommand{\arraystretch}{1.08}
+\setlength{\tabcolsep}{5.2pt}
+\setlength{\heavyrulewidth}{0.08em}
+\setlength{\lightrulewidth}{0.045em}
+\setlength{\aboverulesep}{0.45ex}
+\setlength{\belowrulesep}{0.45ex}
+\setlength{\textfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\emergencystretch=3em
+
+\newcommand{\figdir}{../output/figures}
+\newcommand{\tabdir}{../output/tables}
+
+\title{\vspace{-1.5em}\textbf{Disclosure Timing as a Public Risk Signal:\\Evidence from China's Annual Report Scheduling System}}
+\author{Kaibiao Zhu}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+This paper studies whether publicly observable annual-report disclosure schedules contain incremental information about bad news and short-window downside risk in China's A-share market. The institutional setting is useful because Chinese listed firms announce initial annual-report appointment dates, may revise those dates, and must disclose annual reports before the end of April. Using AkShare data for fiscal years 2019--2023, I combine annual-report appointment records, earnings forecasts, lagged firm fundamentals, and daily stock returns. Bad-news firm-years are substantially more likely to disclose late: after controlling for lagged fundamentals, industry fixed effects, and year fixed effects, realized bad news increases the probability of being in the latest disclosure quartile by 15.5 percentage points. Propensity-score weighting and cross-fitted doubly robust estimation yield effects of 13.8 and 12.5 percentage points, respectively. Out-of-sample prediction tests show that disclosure timing adds modest information beyond lagged fundamentals, while the broader pre-report public information set, especially earnings forecasts, strongly predicts realized bad news. Event-study evidence does not support a strong causal interpretation that late disclosure itself generates negative announcement-window abnormal returns. The contribution is to validate annual-report scheduling as a reproducible public risk signal, quantify its incremental value relative to fundamentals and forecasts, and show where the causal interpretation should stop.
+\end{abstract}
+
+\noindent \textbf{Keywords:} disclosure timing; bad news; annual reports; A-share market; machine learning; event study; causal inference.
+
+\section{Introduction}
+
+Financial disclosure is not only about what firms reveal, but also about when they reveal it. Timing is economically meaningful when investors have limited attention, when managers have discretion over mandatory reporting dates, and when bad news is costly to release. China's A-share market provides a useful setting for studying this issue because listed firms publicly announce scheduled annual-report disclosure dates and may revise them before the actual announcement. This scheduled disclosure system turns timing choices into observable public data rather than an unobserved managerial plan.
+
+This paper asks a focused empirical question: \emph{Do publicly observable annual-report disclosure schedules contain incremental information about bad news and announcement-window downside risk beyond standard financial fundamentals?} The question is deliberately narrower than a general claim that disclosure timing causes stock price declines. Recent evidence shows that annual-report timing in China is related to crash risk, within-industry disclosure herding, and analyst forecast behavior \cite{Li2020,Cao2021,TangBae2021}. Existing work is primarily concerned with disclosure timing as a corporate reporting outcome or with longer-horizon risk. This paper instead evaluates whether the public scheduling record can be used before the annual report as a short-horizon risk signal for realized bad news and announcement-window downside risk.
+
+The analysis uses only free stock-market data accessible through AkShare. The final panel contains 10,455 nonfinancial firm-year observations from fiscal years 2019--2023. The data combine annual-report appointment dates, date revisions, actual disclosure dates, earnings forecasts, lagged financial fundamentals, and daily stock returns. The empirical design has four layers. First, panel regressions test whether bad-news firms disclose later after controlling for observable fundamentals, year effects, and industry effects. Second, machine-learning models evaluate out-of-sample predictive value, using tree-based learners suited to medium-sized tabular data \cite{Grinsztajn2022}. Third, event-study methods measure market-adjusted cumulative abnormal returns around annual-report announcements, following recent Chinese equity event-study practice \cite{LiFangCao2024}. Fourth, inverse-probability weighting and doubly robust estimation sharpen the causal interpretation \cite{Kurz2022}.
+
+The main result is robust but nuanced. Bad-news firms are consistently more likely to disclose late and to postpone disclosure. The baseline fixed-effects linear probability model estimates that realized bad news increases the probability of late disclosure by 15.5 percentage points. Propensity-score weighting and cross-fitted doubly robust estimation confirm a large positive association after balancing observable covariates. However, the event-study evidence does not show a statistically strong negative announcement-window reaction to late disclosure itself. This distinction matters. The paper provides evidence that disclosure timing is informative, but it does not overstate the evidence as proving that late disclosure independently causes post-announcement price declines.
+
+\section{Related Literature and Contribution}
+
+This paper connects three literatures. The first studies strategic financial disclosure timing. Li et al. \cite{Li2020} show that annual-report timing in China is associated with future stock price crash risk. Cao and Wang \cite{Cao2021} exploit China's scheduled disclosure system and show that firms revise reporting dates in ways consistent with within-industry waiting and following behavior. Tang and Bae \cite{TangBae2021} link delayed annual-report disclosure to analyst forecast accuracy and optimism. These studies establish that annual-report timing is economically meaningful in China.
+
+The distinction from Li et al. \cite{Li2020} is the horizon and use case. Their analysis links disclosure timing to future crash risk over longer horizons, while this paper focuses on realized annual-report bad news and announcement-window abnormal returns. The distinction from the broader disclosure-timing literature is also important: I do not only re-estimate whether bad news is later; I quantify the modern economic magnitude, evaluate incremental out-of-sample prediction, and examine whether the public schedule has practical value when combined with forecasts and fundamentals.
+
+The second literature uses new data sources and machine learning to improve economic decision making. Recent tabular-learning evidence shows why boosted tree models remain strong benchmarks for medium-sized structured data \cite{Grinsztajn2022}. This motivates a central design principle for this paper: the goal is not methodological complexity for its own sake, but transforming a nonstandard public data source into evidence about an economically meaningful question.
+
+The third literature concerns empirical tools. Recent event-study work for Chinese equity data formalizes the construction of abnormal returns and cumulative abnormal returns around firm-specific event dates \cite{LiFangCao2024}. For causal design, recent work explains augmented inverse-probability weighting as a practical tool for observational treatment-effect estimation \cite{Kurz2022}. For prediction, the paper uses logistic regression, random forests, and gradient boosting, with SHAP-style interpretability used to summarize variable contributions.
+
+The contribution is therefore incremental and transparent. I do not claim to discover strategic annual-report timing for the first time. Instead, I ask whether the public scheduling process itself can be used as a real-time risk signal in a reproducible, free-data setting. This matters because investors and regulators can observe schedule appointments and revisions before the annual report is released, making the signal operational rather than merely retrospective.
+
+\section{Hypothesis Development}
+
+The hypotheses are grounded in three economic theories. Discretionary disclosure theory predicts that managers with private information choose disclosure policies strategically when disclosure is costly or when nondisclosure can temporarily pool bad firms with better firms. Signaling theory implies that observable actions by informed agents can reveal information about unobserved quality when those actions carry costs; in this setting, late or revised schedules may carry reputational or regulatory costs. Market-efficiency theory predicts that public information should be incorporated into prices. Limited investor attention further implies that bad news released late in a crowded disclosure window may be processed differently by investors.
+
+\paragraph{H1. Bad news and strategic delay.}
+Strategic disclosure theory predicts that firms with unfavorable performance have stronger incentives to delay annual-report release or revise scheduled dates. China's end-of-April deadline creates a natural late-disclosure window in which bad-news firms may cluster. Therefore:
+
+\noindent \textbf{H1:} Ceteris paribus, firms with realized bad news are more likely to disclose their annual reports late and to postpone their initially scheduled disclosure dates.
+
+\paragraph{H2. Incremental information in disclosure schedules.}
+If disclosure timing reflects managers' current private information, then the public schedule should contain information beyond lagged accounting fundamentals. Lagged fundamentals summarize past performance, whereas appointment dates and revisions may reflect managers' knowledge of current annual-report outcomes. Therefore:
+
+\noindent \textbf{H2:} Annual-report disclosure schedules contain incremental out-of-sample information about realized bad news beyond standard lagged financial fundamentals.
+
+\paragraph{H3. Announcement-window market reaction.}
+If late disclosure is a bad-news signal and the market has not fully incorporated that signal before the annual-report date, late-disclosure firms should experience more negative abnormal returns when the report is released. Therefore:
+
+\noindent \textbf{H3:} Late-disclosure firms experience more negative cumulative abnormal returns during the annual-report announcement window than earlier-disclosing firms.
+
+\section{Data and Measurement}
+
+\subsection{Sources and sample}
+
+The paper uses AkShare interfaces to collect annual-report appointment data, earnings forecasts, and stock returns. Annual-report schedules come from the Eastmoney appointment disclosure interface. Earnings forecasts are used to construct pre-report bad-news signals. Firm fundamentals are taken from an AkShare financial panel. Daily stock returns are collected through AkShare's Sina daily stock interface, and the CSI 300 index is used as the market benchmark.
+
+The sample covers fiscal years 2019--2023 and excludes financial firms because their balance sheets and leverage are structurally different. After merging schedules, forecasts, and lagged fundamentals, the main panel contains 10,455 firm-year observations. Table \ref{tab:sample} summarizes the annual sample. The bad-news rate rises in 2022 and remains high in 2023, which is consistent with the weaker profitability environment observed in many listed firms after the pandemic period.
+
+The data construction proceeds in four steps. I first collect annual-report appointment records and earnings forecasts by fiscal year, then standardize stock codes and disclosure dates. I next merge these records to the firm financial panel by stock code and fiscal year, construct lagged fundamentals from the previous fiscal year, and winsorize continuous variables within fiscal year. Missing forecast indicators are coded as zero, while missing forecast intensity variables are imputed with the sample median; regressions and causal estimators then require nonmissing lagged controls. Industry fixed effects use the industry labels returned in the AkShare/THS financial panel, with sparse industries pooled into an ``Other'' category.
+
+\begin{table}[H]
+\centering
+\caption{Sample composition by fiscal year}
+\label{tab:sample}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Fiscal year & Firm-years & Bad-news rate & Severe bad-news rate & Late rate & Forecast available \\
+\midrule
+2019 & 1,903 & 16.8\% & 16.8\% & 27.3\% & 49.4\% \\
+2020 & 2,013 & 18.3\% & 17.9\% & 27.9\% & 53.8\% \\
+2021 & 2,110 & 20.8\% & 18.9\% & 29.8\% & 51.7\% \\
+2022 & 2,190 & 29.0\% & 26.1\% & 26.1\% & 51.8\% \\
+2023 & 2,239 & 27.6\% & 25.0\% & 28.5\% & 51.9\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.86\textwidth]{\figdir/figure_09_sample_trends.png}
+\caption{Sample coverage, bad-news rate, and late-disclosure rate by fiscal year.}
+\label{fig:sampletrends}
+\end{figure}
+
+\subsection{Key variables}
+
+The main outcome in the disclosure-timing regressions is \textit{LateDisclosure}, equal to one if a firm's actual annual-report disclosure date lies in the latest quartile within the fiscal year. I also study \textit{Postponed}, equal to one if the actual disclosure date is later than the initial appointment date, and \textit{DelayDays}, the number of days between actual and initial disclosure dates.
+
+The main explanatory variable is \textit{BadNews}, defined from realized annual-report outcomes. A firm-year is classified as bad news if the firm reports a loss, negative earnings per share, or a large year-over-year net profit decline. This definition is intentionally transparent and based on realized accounting outcomes. I also construct forecast-based bad-news indicators from earnings forecasts available before the annual report.
+
+Control variables are lagged financial fundamentals: firm size, profitability, leverage, revenue growth, profit growth, earnings per share, cash flow per share, and liquidity. The lag structure is important because it reduces mechanical look-ahead bias when testing whether pre-report observables explain disclosure timing and bad-news risk.
+
+\begin{table}[H]
+\centering
+\caption{Descriptive statistics for main controls and public signals}
+\label{tab:descstats}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Variable & Mean & Std. dev. & Median & Observations \\
+\midrule
+Lag size & 3.552 & 1.406 & 3.362 & 10,455 \\
+Lag profitability & 6.400 & 16.968 & 7.715 & 10,394 \\
+Lag leverage & 44.539 & 20.348 & 43.280 & 10,455 \\
+Lag revenue growth & 11.151 & 28.982 & 8.495 & 10,454 \\
+Lag profit growth & -34.039 & 331.052 & 8.430 & 10,454 \\
+Lag EPS & 0.461 & 0.785 & 0.320 & 10,452 \\
+Lag cash flow per share & 0.682 & 1.077 & 0.440 & 10,452 \\
+Initial appointment day & 104.850 & 15.143 & 111.000 & 10,455 \\
+Actual disclosure day & 106.524 & 14.978 & 112.000 & 10,455 \\
+Forecast bad-news signal & 0.273 & 0.446 & 0.000 & 10,455 \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}
+\footnotesize Notes: The table reports selected variables from the full descriptive-statistics file generated by the replication code. Day variables are measured as day of year.
+\end{flushleft}
+\end{table}
+
+\section{Empirical Design}
+
+\subsection{Strategic disclosure regressions}
+
+The first empirical specification tests whether bad-news firms disclose later:
+\begin{equation}
+LateDisclosure_{i,t} =
+\alpha + \beta BadNews_{i,t} + X_{i,t-1}'\gamma
++ \lambda_{industry} + \delta_t + \varepsilon_{i,t},
+\end{equation}
+where $X_{i,t-1}$ includes lagged financial fundamentals, $\lambda_{industry}$ are industry fixed effects, and $\delta_t$ are fiscal-year fixed effects. Similar specifications use \textit{Postponed} and \textit{DelayDays} as outcomes. The coefficient $\beta$ should be interpreted as conditional association rather than a fully exogenous causal effect.
+
+\subsection{Prediction design}
+
+The prediction analysis uses a time split: fiscal years 2019--2021 for training, 2022 for validation, and 2023 for testing. Models are estimated under four feature sets: lagged fundamentals, fundamentals plus initial schedule, fundamentals plus full schedule, and full public signals including earnings forecasts. Logistic regression is used as a linear benchmark, random forests as a nonlinear benchmark, and LightGBM as the primary gradient-boosting model. Hyperparameters are selected using the 2022 validation year; the LightGBM specification uses 350 trees, learning rate 0.035, maximum depth 5, 15 leaves, minimum child samples 35, and row/column subsampling of 0.85. I use SHAP values to interpret the final LightGBM model and identify which public signals drive bad-news predictions. This design asks whether disclosure scheduling has incremental out-of-sample information beyond conventional financial variables.
+
+\subsection{Event study and causal design}
+
+For event-study tests, I compute market-adjusted abnormal returns around the actual annual-report disclosure date:
+\begin{equation}
+AR_{i,\tau} = R_{i,\tau} - R^{CSI300}_{\tau}.
+\end{equation}
+I report cumulative abnormal returns over $[-1,+1]$, $[0,+5]$, and $[+1,+20]$ windows. The event-study sample starts from firm-years with nonmissing annual-report disclosure dates in fiscal years 2021--2023, draws a stratified sample for runtime and API stability, and keeps events with complete stock and CSI 300 returns from 20 trading days before to 20 trading days after disclosure. To discipline causal interpretation, I estimate propensity scores and inverse-probability weights for two designs: first, whether bad news affects late disclosure; second, whether late disclosure affects $CAR[0,+5]$. The first design also reports a five-fold cross-fitted AIPW estimator; the propensity model is a regularized logistic specification and the outcome nuisance functions are random-forest regressions.
+
+\section{Main Results}
+
+\subsection{Bad-news firms disclose later}
+
+This subsection tests H1 by examining whether realized bad news predicts late disclosure and postponement. Table \ref{tab:mainreg} reports the core regression results. Bad news is strongly associated with late disclosure. In the baseline fixed-effects linear probability model, bad news increases the probability of being in the latest disclosure quartile by 15.5 percentage points. Bad-news firms are also 7.2 percentage points more likely to postpone disclosure and delay annual-report release by about one additional day.
+
+\begin{table}[H]
+\centering
+\caption{Core disclosure-timing regressions}
+\label{tab:mainreg}
+\small
+\begin{tabular}{llrrr}
+\toprule
+Outcome & Key variable & Coef. & Std. err. & $p$-value \\
+\midrule
+Late disclosure & Realized bad news & 0.155 & 0.012 & $<0.001$ \\
+Postponed & Realized bad news & 0.072 & 0.009 & $<0.001$ \\
+Delay days & Realized bad news & 0.998 & 0.205 & $<0.001$ \\
+Late disclosure & Bad forecast & 0.152 & 0.013 & $<0.001$ \\
+Late disclosure & Forecast available & -0.050 & 0.011 & $<0.001$ \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}
+\footnotesize Notes: Regressions control for lagged fundamentals, year fixed effects, and industry fixed effects where applicable. Standard errors are heteroskedasticity-robust.
+\end{flushleft}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\textwidth]{\figdir/figure_10_core_regression_coefficients.png}
+\caption{Core regression coefficients with 95 percent confidence intervals.}
+\label{fig:coefplot}
+\end{figure}
+
+These results are economically meaningful because disclosure dates are public before the annual report is released. A late or revised schedule can therefore be interpreted as a low-cost warning signal for investors and regulators. The results also align with recent evidence that annual-report timing in China carries information about risk and analyst behavior \cite{Li2020,Cao2021,TangBae2021}, while extending the analysis to a modern free-data pipeline.
+
+\subsection{Size heterogeneity}
+
+As a cross-sectional extension of H1, I ask whether the timing signal is concentrated among smaller firms, where information asymmetry is often more severe, or whether it is broad across the market. I split firms by the fiscal-year median of lagged size and estimate the baseline late-disclosure regression with a \textit{BadNews} by \textit{LargeFirm} interaction, retaining the same controls and fixed effects. Table \ref{tab:sizehetero} shows little evidence of economically meaningful heterogeneity: the bad-news effect is about 15.5 percentage points for both small and large firms, and the large-minus-small contrast is essentially zero. Thus, the main timing result does not appear to be driven by one size segment.
+
+\begin{table}[H]
+\centering
+\caption{Size heterogeneity in the bad-news disclosure-timing relation}
+\label{tab:sizehetero}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Group or contrast & Effect & Std. err. & $p$-value & Firm-years & Late rate \\
+\midrule
+Small firms & 0.155 & 0.016 & $<0.001$ & 5,101 & 29.6\% \\
+Large firms & 0.155 & 0.017 & $<0.001$ & 5,102 & 26.1\% \\
+Large minus small & 0.000 & 0.023 & 0.998 & -- & -- \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}
+\footnotesize Notes: Firms are split by the fiscal-year median of lagged size. Effects are linear combinations from a fixed-effects LPM of late disclosure on bad news, large-firm status, their interaction, lagged controls, year fixed effects, and industry fixed effects. The contrast tests whether the bad-news effect differs between large and small firms.
+\end{flushleft}
+\end{table}
+
+\subsection{Predictive value of disclosure schedules}
+
+This subsection tests H2 by evaluating whether disclosure schedules improve out-of-sample bad-news prediction beyond lagged fundamentals. Table \ref{tab:prediction} summarizes the results. Using only lagged fundamentals, LightGBM achieves a 2023 test AUC of 0.752. Adding full schedule variables increases the AUC to 0.757. The gain is positive but modest; a bootstrap test estimates an AUC gain of 0.005 with a confidence interval that includes zero. Thus, timing alone should be described as suggestive incremental information, not a decisive prediction breakthrough.
+
+\begin{table}[H]
+\centering
+\caption{Selected out-of-sample bad-news prediction results}
+\label{tab:prediction}
+\small
+\begin{tabular}{llrrr}
+\toprule
+Feature set & Model & Test AUC & Avg. precision & Top-decile bad-news rate \\
+\midrule
+Lag fundamentals & Logistic & 0.706 & 0.510 & 0.692 \\
+Lag fundamentals & LightGBM & 0.752 & 0.544 & 0.656 \\
+Fundamentals + full schedule & LightGBM & 0.757 & 0.556 & 0.665 \\
+Full public signals + forecast & Logistic & 0.980 & 0.944 & 0.964 \\
+Full public signals + forecast & LightGBM & 0.991 & 0.973 & 0.991 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.86\textwidth]{\figdir/figure_11_prediction_auc_heatmap.png}
+\caption{Out-of-sample test AUC by model and feature set.}
+\label{fig:aucheat}
+\end{figure}
+
+The full public-information feature set performs much better because earnings forecasts contain direct pre-report information about likely annual-report outcomes. This is useful for risk screening, but it also clarifies the contribution of disclosure timing: timing is informative, while forecasts are the dominant public pre-report signal.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.84\textwidth]{\figdir/figure_04_shap_summary_public_signals.png}
+\caption{SHAP summary for the LightGBM model using public pre-report signals.}
+\label{fig:shap}
+\end{figure}
+
+The SHAP decomposition supports the same interpretation. Forecast-based variables are the largest contributors to bad-news prediction, while actual disclosure timing and the gap between forecast and report dates also enter the model. Thus, disclosure scheduling is not the dominant signal once earnings forecasts are observed, but it remains part of the public information set that helps separate high-risk from low-risk firm-years.
+
+\section{Event Study, Economic Value, and Causal Evidence}
+
+\subsection{Event-window market reaction}
+
+This subsection tests H3 by analyzing market-adjusted cumulative abnormal returns around annual-report disclosure dates. The event-study sample contains 240 valid annual-report disclosure events. It is drawn from 6,539 candidate firm-years with nonmissing actual disclosure dates in fiscal years 2021--2023 and complete daily return windows. The results do not show a statistically strong announcement-window penalty for late-disclosure bad-news firms. In a regression for $CAR[0,+5]$, the interaction between late disclosure and bad news is positive but statistically insignificant. The event-study figure, which includes 95 percent confidence intervals, likewise does not show a clean negative divergence after the disclosure date.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.84\textwidth]{\figdir/figure_05_event_study_late_vs_early.png}
+\caption{Mean cumulative abnormal returns around annual-report disclosure dates with 95 percent confidence intervals.}
+\label{fig:event}
+\end{figure}
+
+This null result is important. It suggests that the market may partially absorb bad news before the annual report date through earnings forecasts, schedule revisions, or other public information. It also prevents an overly strong causal claim that late disclosure itself causes short-window stock price declines.
+
+\subsection{Economic value}
+
+Although the event reaction is not statistically strong, model-based risk screening has practical value. In the 2023 event sample, avoiding the top 20 percent of predicted bad-news risk events avoids 32 events, all of which are bad-news cases in this sample. The kept portfolio has a slightly higher mean $CAR[0,+5]$ and a less severe 10 percent downside tail than the full event portfolio. Avoiding the top 10 percent produces a similar pattern.
+
+This exercise should be read as a risk-management illustration rather than a complete trading strategy. It does not include transaction costs, turnover constraints, suspension risk, or limit-up/limit-down frictions. Its value is mainly to show that the public signal can be operationalized in a way that investors and regulators can understand.
+
+\subsection{Causal design}
+
+Table \ref{tab:causal} reports the stricter causal-design estimates. For the first design, bad news remains strongly associated with late disclosure after propensity-score weighting. The IPW estimate is 13.8 percentage points and the cross-fitted AIPW estimate is 12.5 percentage points. Balance diagnostics show that weighting reduces mean absolute standardized mean differences from 0.318 to 0.089.
+
+For the second design, late disclosure does not have a statistically significant effect on $CAR[0,+5]$ after weighting. The point estimate is 1.85 percentage points with a $p$-value of 0.188. The placebo pre-window estimate is also not cleanly zero at conventional comfort levels, which reinforces the need for caution when interpreting event-window causal effects.
+
+\begin{table}[H]
+\centering
+\caption{Causal-design estimates}
+\label{tab:causal}
+\small
+\begin{tabular}{llrrr}
+\toprule
+Design & Estimator & Estimate & Std. err. & $p$-value \\
+\midrule
+Bad news $\rightarrow$ late disclosure & Naive difference & 0.183 & -- & -- \\
+Bad news $\rightarrow$ late disclosure & IPW & 0.138 & 0.013 & $<0.001$ \\
+Bad news $\rightarrow$ late disclosure & Cross-fitted AIPW & 0.125 & 0.011 & $<0.001$ \\
+Late disclosure $\rightarrow CAR[0,+5]$ & Naive difference & 0.008 & -- & -- \\
+Late disclosure $\rightarrow CAR[0,+5]$ & IPW & 0.019 & 0.014 & 0.188 \\
+Late disclosure $\rightarrow CAR[-5,-1]$ & IPW placebo & 0.015 & 0.009 & 0.100 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\textwidth]{\figdir/figure_08_causal_balance_diagnostics.png}
+\caption{Covariate balance before and after inverse-probability weighting.}
+\label{fig:balance}
+\end{figure}
+
+\section{Robustness and Limitations}
+
+The robustness checks support the main timing result. Alternative late-disclosure thresholds yield similar positive coefficients. A placebo prediction exercise that randomly permutes labels produces average AUC below 0.5, while the true model remains well above random performance. Alternative bad-news definitions also preserve strong prediction performance, although schedule-only incremental prediction remains modest.
+
+Several limitations remain. First, the paper does not exploit a natural experiment in disclosure timing. The strongest causal evidence concerns the relationship from bad news to late disclosure conditional on observables, not the causal effect of late disclosure on returns. Second, the event-study sample is capped for runtime and API stability. Expanding the sample would improve precision. Third, short-window event returns use unadjusted close prices for API stability; for a few-day window this is acceptable, but a full journal submission should use consistently adjusted returns and account for trading frictions. Finally, the high predictive performance of the full public-information model is driven partly by earnings forecasts, which are themselves direct disclosures of expected performance.
+
+\section{Conclusion}
+
+This paper shows that public annual-report scheduling behavior in China's A-share market contains economically meaningful information. Unlike prior studies that mainly examine disclosure timing as an outcome of managerial behavior or as a predictor of longer-horizon crash risk, this paper treats the publicly observable annual-report schedule as a real-time risk-screening signal. A further contribution is reproducibility: while many empirical finance settings rely on proprietary or subscription-based databases, this paper builds the full pipeline using free public data accessed through AkShare, including disclosure schedules, earnings forecasts, firm fundamentals, and stock returns. The contribution is to quantify whether this freely observable signal adds out-of-sample predictive value beyond lagged fundamentals, to compare it with earnings forecasts, and to show that its value is informational rather than a standalone causal trigger for announcement-window losses. Bad-news firms disclose later and postpone more often, and the relationship remains large after controlling for lagged fundamentals, industry, and year effects. The results strongly support H1. Machine-learning validation provides qualified support for H2, while the event-study evidence does not support H3.
+
+The most important conclusion is disciplined rather than overstated. Disclosure scheduling is a useful public risk signal, but late disclosure does not by itself generate a statistically strong negative announcement-window return in the event-study sample. This suggests that investors may incorporate bad-news information before the annual report date through forecasts, schedule revisions, and other public signals. For regulators, the implication is to build schedule-based monitoring dashboards that flag firms with repeated postponements or unusually late disclosure relative to industry peers. For investors, the implication is to use disclosure timing as an auxiliary risk variable, combined with earnings forecasts and fundamentals, rather than as a standalone trading rule.
+
+\section{Data and Code Availability}
+
+All data used in the paper are obtainable from public AkShare interfaces or cached intermediate files produced by the replication notebook. The full workflow is contained in the GitHub repository \href{https://github.com/George-hardworking/data-science-in-empirical-economics}{data-science-in-empirical-economics}, under \texttt{final/improved\_version\_disclosure\_timing}. The executed notebook downloads or reads cached annual-report schedules, earnings forecasts, financial fundamentals, stock returns, and market returns; merges them by stock code and fiscal year; constructs timing, forecast, and lagged fundamental variables; estimates all regressions and prediction models; and writes all tables and figures. The executed environment used Python 3.11.14, AkShare 1.18.55, pandas 2.3.3, scikit-learn 1.7.2, LightGBM 4.6.0, statsmodels 0.14.5, matplotlib 3.10.7, and seaborn 0.13.2.
+
+\smallskip
+\scriptsize
+\setlength{\itemsep}{0pt}
+\setlength{\parskip}{0pt}
+\begin{thebibliography}{99}
+
+\bibitem{Li2020}
+Li, Tao, Xiang, Cheng, Liu, Zhuo, and Cai, Wenwu (2020). Annual report disclosure timing and stock price crash risk. \emph{Pacific-Basin Finance Journal}, 62, 101392.
+\href{https://doi.org/10.1016/j.pacfin.2020.101392}{https://doi.org/10.1016/j.pacfin.2020.101392}.
+
+\bibitem{Cao2021}
+Cao, Shijiao, and Wang, Jianqiong (2021). Waiting and following: Within-industry herding behavior in annual report disclosure. \emph{China Journal of Accounting Research}, 14(3), 295--314.
+\href{https://doi.org/10.1016/j.cjar.2021.05.004}{https://doi.org/10.1016/j.cjar.2021.05.004}.
+
+\bibitem{TangBae2021}
+Tang, Kai, and Bae, Khee Su (2021). The influence of annual reports' disclosure delay on the analysts' forecast behavior: An empirical study in China. \emph{The Journal of Asian Finance, Economics and Business}, 8(6), 859--867.
+\href{https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002723651}{KCI article page}.
+
+\bibitem{Grinsztajn2022}
+Grinsztajn, Leo, Oyallon, Edouard, and Varoquaux, Gael (2022). Why do tree-based models still outperform deep learning on typical tabular data? \emph{Advances in Neural Information Processing Systems}, 35.
+\href{https://proceedings.neurips.cc/paper_files/paper/2022/hash/0378c7692da36807bdec87ab043cdadc-Abstract-Datasets_and_Benchmarks.html}{NeurIPS proceedings page}.
+
+\bibitem{LiFangCao2024}
+Li, Hao, Fang, Jiahui, and Cao, Hanyue (2024). cnevent: Event study with Chinese equity market data. \emph{The Stata Journal}, 24(1), 62--81.
+\href{https://doi.org/10.1177/1536867X241233641}{doi:10.1177/1536867X241233641}.
+
+\bibitem{Kurz2022}
+Kurz, Malte S. (2022). Augmented inverse probability weighting and the double robustness property. \emph{Medical Research Archives}, 10(11).
+\href{https://doi.org/10.18103/mra.v10i11.3326}{doi:10.18103/mra.v10i11.3326}.
+
+\end{thebibliography}
+
+\end{document}

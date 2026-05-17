@@ -1,0 +1,2 @@
+﻿comparison,auc_gain,bootstrap_ci_low,bootstrap_ci_high,bootstrap_p_gain_le_zero,n_bootstrap
+LightGBM: full schedule vs lag fundamentals,0.005329184866072256,-0.004974017460346669,0.01729131962815221,0.18,500

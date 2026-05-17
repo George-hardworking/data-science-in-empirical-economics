@@ -1,0 +1,4 @@
+﻿model,selection_rule,selected_parameters,rationale
+Logistic,Time validation on fiscal year 2022,max_iter=2000; class_weight=balanced,Transparent linear benchmark with class imbalance adjustment.
+Random Forest,Small validation grid on fiscal year 2022; final model chosen for validation AUC and stability,n_estimators=350; max_depth=8; min_samples_leaf=20; class_weight=balanced_subsample,Nonlinear benchmark with restrained depth to reduce overfitting.
+LightGBM,Small validation grid on fiscal year 2022; final model chosen for validation AUC and calibration stability,n_estimators=350; learning_rate=0.035; num_leaves=15; max_depth=5; min_child_samples=35; subsample=0.85; colsample_bytree=0.85; class_weight=balanced,Primary gradient-boosting model used for out-of-sample prediction and SHAP interpretation.
