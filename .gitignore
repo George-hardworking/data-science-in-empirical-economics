@@ -210,3 +210,7 @@ __marimo__/
 /final/output/disclosure_timing_project
 
 compile.sh
+
+.vscode
+.claude
+.sixth
